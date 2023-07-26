@@ -1,10 +1,13 @@
+modelnet40data*
 adni-ventricles/
 data/
+bests/
 data_old/
 *.ipynb
 *.csv
 pointnet/*/
 voxnet/*/
+.DS_store
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
