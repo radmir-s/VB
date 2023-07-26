@@ -40,8 +40,9 @@ def pipe_data(data_path_frmt, data_split='train', batch_size=64):
 
     ds =  tf.data.Dataset.zip((arrays, one_hot_labels))
 
-    ds = ds.cache() 
-    # ds = ds.shuffle(buffer_size=1000)  # causes problems
+    ds = ds.cache("./data.tfcache") 
+    # ds = ds.cache()
+    ds = ds.shuffle(buffer_size=512)
     ds = ds.batch(batch_size)  
     ds = ds.prefetch(tf.data.experimental.AUTOTUNE)  
 

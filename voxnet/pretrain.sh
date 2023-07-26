@@ -10,7 +10,7 @@
 #SBATCH -t 2-00:00:00
 #SBATCH -N 1 -n 2
 #SBATCH --gpus=1 
-#SBATCH --mem=16GB
+#SBATCH --mem=64GB
 
 module add TensorFlow
 
