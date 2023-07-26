@@ -61,8 +61,8 @@ net.compile(optimizer=adam_opt,
 reduce_lr = callbacks.ReduceLROnPlateau(
     factor=0.7, 
     min_lr=0.00001, 
-    monitor='loss', 
-    patience=30,
+    monitor='val_loss', 
+    patience=20,
     verbose=0
 )
 

@@ -48,7 +48,7 @@ net = getPointNet(
     classifier=classifier
 )
 
-adam_opt = tf.keras.optimizers.Adam(learning_rate=0.01)
+adam_opt = tf.keras.optimizers.Adam(learning_rate=0.001)
 net.compile(optimizer=adam_opt,
             jit_compile=jit_compile,
             weighted_metrics=[],
@@ -59,8 +59,8 @@ net.compile(optimizer=adam_opt,
 reduce_lr = callbacks.ReduceLROnPlateau(
     factor=0.7, 
     min_lr=0.00001, 
-    monitor='loss', 
-    patience=30,
+    monitor='val_loss', 
+    patience=20,
     verbose=0
 )
 
