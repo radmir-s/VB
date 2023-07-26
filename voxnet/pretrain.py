@@ -2,6 +2,7 @@ import sys
 import os
 import glob
 from datetime import datetime
+import random
 
 import numpy as np
 import pandas as pd
@@ -21,6 +22,7 @@ cls_num = 40
 
 def pipe_data(data_path_frmt, data_split='train', batch_size=64):
     npy_files = glob.glob(data_path_frmt.format(data_split))
+    random.shuffle(npy_files)
 
     path_ds = tf.data.Dataset.from_tensor_slices(npy_files)
     def load_npy(file_path):
@@ -39,7 +41,7 @@ def pipe_data(data_path_frmt, data_split='train', batch_size=64):
     ds =  tf.data.Dataset.zip((arrays, one_hot_labels))
 
     ds = ds.cache() 
-    ds = ds.shuffle(buffer_size=10000)  
+    # ds = ds.shuffle(buffer_size=1000)  # causes problems
     ds = ds.batch(batch_size)  
     ds = ds.prefetch(tf.data.experimental.AUTOTUNE)  
 
@@ -64,11 +66,11 @@ reduce_lr = callbacks.ReduceLROnPlateau(
     factor=0.5, 
     min_lr=0.00001, 
     monitor='val_loss', 
-    patience=50,
+    patience=20,
     verbose=0
 )
 modelstamp = f'../bests/modelnet-t{timestamp}'
-csv_log = callbacks.CSVLogger(f'{modelstamp}.csv')
+csv_log = callbacks.CSVLogger(f'{modelstamp}.log')
 checkpoint = callbacks.ModelCheckpoint(
     filepath=modelstamp,
     save_best_only=True,
@@ -76,7 +78,7 @@ checkpoint = callbacks.ModelCheckpoint(
 )
 early_stop = tf.keras.callbacks.EarlyStopping(
     monitor='val_loss',
-    patience=200,
+    patience=100,
     verbose=0
 )
 

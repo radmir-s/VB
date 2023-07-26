@@ -1,6 +1,6 @@
 #!/bin/bash 
-#SBATCH -J  job_vox
-#SBATCH -o  job_vox.o%j
+#SBATCH -J  job_vox_modelnet
+#SBATCH -o  job_vox_modelnet.o%j
 
 #SBATCH -A mang
 #SBATCH --mail-user=rsultamuratov@uh.edu
