@@ -60,11 +60,11 @@ reduce_lr = callbacks.ReduceLROnPlateau(
     factor=0.7, 
     min_lr=0.00001, 
     monitor='val_loss', 
-    patience=20,
+    patience=50,
     verbose=0
 )
 
-modelstamp = f'pointnet-b{sys.argv[2]}-c{sys.argv[3]}-t{timestamp}'
+modelstamp = f'voxnet-b{sys.argv[2]}-c{sys.argv[3]}-t{timestamp}'
 csv_log = callbacks.CSVLogger(f'{modelstamp}.csv')
 checkpoint = callbacks.ModelCheckpoint(
     filepath=modelstamp,
@@ -73,7 +73,7 @@ checkpoint = callbacks.ModelCheckpoint(
 )
 early_stop = tf.keras.callbacks.EarlyStopping(
     monitor='val_loss',
-    patience=100,
+    patience=200,
     verbose=0
 )
 

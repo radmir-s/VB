@@ -50,7 +50,7 @@ net = getVoxNet(
     classifier=classifier
 )
 
-adam_opt = tf.keras.optimizers.Adam(learning_rate=0.01)
+adam_opt = tf.keras.optimizers.Adam(learning_rate=0.001)
 net.compile(optimizer=adam_opt,
             jit_compile=jit_compile,
             weighted_metrics=[],
@@ -62,7 +62,7 @@ reduce_lr = callbacks.ReduceLROnPlateau(
     factor=0.7, 
     min_lr=0.00001, 
     monitor='val_loss', 
-    patience=20,
+    patience=50,
     verbose=0
 )
 
@@ -75,7 +75,7 @@ checkpoint = callbacks.ModelCheckpoint(
 )
 early_stop = tf.keras.callbacks.EarlyStopping(
     monitor='val_loss',
-    patience=100,
+    patience=200,
     verbose=0
 )
 

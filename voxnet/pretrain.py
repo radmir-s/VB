@@ -56,7 +56,7 @@ print(f"Modelnet: Training started at {timestamp}")
 
 net = getVoxNet2(cls_num)
 
-adam_opt = tf.keras.optimizers.Adam(learning_rate=0.005)
+adam_opt = tf.keras.optimizers.Adam(learning_rate=0.001)
 net.compile(optimizer=adam_opt,
             weighted_metrics=[],
             loss=tf.keras.losses.CategoricalCrossentropy(),
@@ -79,7 +79,7 @@ checkpoint = callbacks.ModelCheckpoint(
 )
 early_stop = tf.keras.callbacks.EarlyStopping(
     monitor='val_loss',
-    patience=50,
+    patience=200,
     verbose=0
 )
 
