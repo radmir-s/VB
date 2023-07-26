@@ -1,7 +1,7 @@
 import tensorflow as tf
 from tensorflow.keras import layers
 
-def getVoxNet(backbone, classifier, cls_num=3, activ='relu'):
+def getVoxNet(backbone, classifier, cls_num=3, batch=True):
     filt1, filt2 = backbone
     
     net = tf.keras.Sequential()
@@ -24,6 +24,34 @@ def getVoxNet(backbone, classifier, cls_num=3, activ='relu'):
         net.add(layers.BatchNormalization())
         net.add(layers.ReLU())
         net.add(layers.Dropout(0.3))
+    
+    net.add(layers.Dense(units=cls_num, activation='softmax'))
+
+    return net
+
+def getVoxNet2(cls_num):
+    
+    net = tf.keras.Sequential()
+    net.add(tf.keras.layers.InputLayer(input_shape=(30, 30, 30, 1)))
+
+    net.add(layers.Conv3D(filters=32, kernel_size=(5, 5, 5), use_bias=False))
+    net.add(layers.BatchNormalization())
+    net.add(layers.ReLU())
+    net.add(layers.MaxPooling3D(pool_size=(2, 2, 2)))
+    net.add(layers.Dropout(0.3))
+    
+    net.add(layers.Conv3D(filters=32, kernel_size=(3, 3, 3), use_bias=False))
+    net.add(layers.BatchNormalization())
+    net.add(layers.ReLU())
+    net.add(layers.MaxPooling3D(pool_size=(2, 2, 2)))
+    net.add(layers.Dropout(0.3))
+
+    net.add(layers.Flatten())
+
+    net.add(layers.Dense(units=128, use_bias=False))
+    net.add(layers.BatchNormalization())
+    net.add(layers.ReLU())
+    net.add(layers.Dropout(0.3))
     
     net.add(layers.Dense(units=cls_num, activation='softmax'))
 
