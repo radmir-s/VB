@@ -19,6 +19,7 @@ home=/project/mang/rsultamu/ventricles/voxnet
 code=$home/pretrain.py
 
 epochs=$1
+lr=$2
 
 cd $home
-python $code $epochs
+python $code $epochs $lr

@@ -17,6 +17,7 @@ for device in tf.config.list_physical_devices():
     print(device)
 
 epochs = int(sys.argv[1])
+lr = float(sys.argv[2])
 data_path = '../modelnet40data/*/30/{}/*.npy'
 cls_num = 40
 
@@ -56,7 +57,7 @@ print(f"Modelnet: Training started at {timestamp}")
 
 net = getVoxNet2(cls_num)
 
-adam_opt = tf.keras.optimizers.Adam(learning_rate=0.001)
+adam_opt = tf.keras.optimizers.Adam(learning_rate=lr)
 net.compile(optimizer=adam_opt,
             weighted_metrics=[],
             loss=tf.keras.losses.CategoricalCrossentropy(),
@@ -65,7 +66,7 @@ net.compile(optimizer=adam_opt,
 
 reduce_lr = callbacks.ReduceLROnPlateau(
     factor=0.7, 
-    min_lr=0.00001, 
+    min_lr=lr/100, 
     monitor='val_loss', 
     patience=10,
     verbose=0

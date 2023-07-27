@@ -50,7 +50,7 @@ net = getVoxNet(
     classifier=classifier
 )
 
-adam_opt = tf.keras.optimizers.Adam(learning_rate=0.001)
+adam_opt = tf.keras.optimizers.Adam(learning_rate=0.0001)
 net.compile(optimizer=adam_opt,
             jit_compile=jit_compile,
             weighted_metrics=[],
