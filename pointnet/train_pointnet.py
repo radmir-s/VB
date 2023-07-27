@@ -60,7 +60,7 @@ reduce_lr = callbacks.ReduceLROnPlateau(
     verbose=0
 )
 
-modelstamp = f'voxnet-b{sys.argv[2]}-c{sys.argv[3]}-t{timestamp}'
+modelstamp = f'pointnet-b{sys.argv[2]}-c{sys.argv[3]}-t{timestamp}'
 csv_log = callbacks.CSVLogger(f'{modelstamp}.csv')
 checkpoint = callbacks.ModelCheckpoint(
     filepath=modelstamp,
