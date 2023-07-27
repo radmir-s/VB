@@ -2,6 +2,10 @@ import numpy as np
 from sklearn.decomposition import PCA
 import pandas as pd
 import numpy as np
+import matplotlib.pyplot as plt
+
+def scatter3d(shape):
+    plt.figure().add_subplot(projection='3d').scatter(*shape.T)
 
 def densify(s, voxel=False, xyz=None, css=None):
 
@@ -40,11 +44,11 @@ def densify(s, voxel=False, xyz=None, css=None):
     # dens = dens/dens.sum() # voxel
 
     densecloud = list()
-    for ixyz in np.argwhere(dens):
-        cubeind = indxyz[*ixyz]
+    for ix, iy, iz in np.argwhere(dens):
+        cubeind = indxyz[ix, iy, iz]
         cubepoints = s[cubeind]
         center = cubepoints.mean(axis=0)
-        densecloud.append([*center, dens[*ixyz]])
+        densecloud.append([*center, dens[ix, iy, iz]])
 
     densecloud = np.array(densecloud)
 
@@ -91,3 +95,5 @@ def readvtk(vtk_path, align=True, rescale=False):
         
         if rescale:
             s /= pca.singular_values_
+
+    return s, connections
