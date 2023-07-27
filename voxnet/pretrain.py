@@ -65,7 +65,7 @@ net.compile(optimizer=adam_opt,
 )
 
 reduce_lr = callbacks.ReduceLROnPlateau(
-    factor=0.7, 
+    factor=0.8, 
     min_lr=lr/100, 
     monitor='val_loss', 
     patience=10,
@@ -80,7 +80,7 @@ checkpoint = callbacks.ModelCheckpoint(
 )
 early_stop = tf.keras.callbacks.EarlyStopping(
     monitor='val_loss',
-    patience=200,
+    patience=50,
     verbose=0
 )
 
