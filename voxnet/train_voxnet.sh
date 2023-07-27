@@ -25,7 +25,7 @@ data=/project/mang/rsultamu/ventricles/data
 epochs=$1
 backbone=$2
 classifier=$3
-jit=$4
+lr=$4
 
 cd $home
-python $code $epochs $backbone $classifier $jit
+python $code $epochs $backbone $classifier $lr

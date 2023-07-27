@@ -22,10 +22,7 @@ if len(sys.argv) != 5:
 epochs = int(sys.argv[1])
 backbone = [int(x) for x in sys.argv[2].split('.')]
 classifier = [int(x) for x in sys.argv[3].split('.')]
-jit_compile = bool(int(sys.argv[4]))
-
-if jit_compile:
-    print('JIT compiler is ON')
+lr = float(sys.argv[4])
 
 df = pd.read_csv('../data/adni-LR-nodupsY-train-weights.csv')
 extra_weight = 0.2
@@ -50,19 +47,18 @@ net = getVoxNet(
     classifier=classifier
 )
 
-adam_opt = tf.keras.optimizers.Adam(learning_rate=0.0001)
+adam_opt = tf.keras.optimizers.Adam(learning_rate=lr)
 net.compile(optimizer=adam_opt,
-            jit_compile=jit_compile,
             weighted_metrics=[],
             loss=tf.keras.losses.CategoricalCrossentropy(),
             metrics=['accuracy']
 )
 
 reduce_lr = callbacks.ReduceLROnPlateau(
-    factor=0.7, 
-    min_lr=0.00001, 
+    factor=0.5, 
+    min_lr=lr/100, 
     monitor='val_loss', 
-    patience=50,
+    patience=10,
     verbose=0
 )
 
@@ -75,7 +71,7 @@ checkpoint = callbacks.ModelCheckpoint(
 )
 early_stop = tf.keras.callbacks.EarlyStopping(
     monitor='val_loss',
-    patience=200,
+    patience=50,
     verbose=0
 )
 
