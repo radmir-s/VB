@@ -27,7 +27,7 @@ pretrained_model.layers.pop()
 inputs = pretrained_model.input
 new_layer = layers.Dense(10, activation='softmax')
 outputs = new_layer(pretrained_model.layers[-1].output)
-new_model = Model(inputs=inputs, outputs=outputs)
+new_model = keras.Model(inputs=inputs, outputs=outputs)
 
 # for layer in new_model.layers[:1]:
 #     layer.trainable = False
