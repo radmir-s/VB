@@ -84,7 +84,7 @@ if weights:
     validation_data=(X_valid, Y_valid, W_valid)
 else:
     sample_weight=None
-    validation_data=None   
+    validation_data=(X_valid, Y_valid)   
 
 history = new_model.fit(
     X_train,
