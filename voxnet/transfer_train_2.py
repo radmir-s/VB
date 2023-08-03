@@ -25,7 +25,7 @@ jobid = args.job_id
 pretrained_model = tf.keras.models.load_model('./bests/modelnet-t07.26.2023@19:30')
 pretrained_model.layers.pop()
 inputs = pretrained_model.input
-new_layer = layers.Dense(10, activation='softmax')
+new_layer = layers.Dense(3, activation='softmax', name='new_layer')
 outputs = new_layer(pretrained_model.layers[-1].output)
 new_model = tf.keras.Model(inputs=inputs, outputs=outputs)
 
