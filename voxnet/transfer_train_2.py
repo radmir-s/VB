@@ -2,6 +2,7 @@ import os
 import sys
 import pandas as pd
 import numpy as np
+import argparse
 
 import tensorflow as tf
 from sklearn.preprocessing import OneHotEncoder
@@ -9,34 +10,20 @@ from datetime import datetime
 from tensorflow.keras import callbacks, layers
 
 
-epochs = int(sys.argv[1])
-class_layers = map(int, sys.argv[2].split('.'))
-lr = float(sys.argv[3])
+parser.add_argument('-e', '--epochs', type=int, default=1000)
+parser.add_argument('-l', '--learning-rate', type=float, default=0.0001)
+parser.add_argument('-w', '--weight', action='store_true',
+                    help='Set weight to true')
+args = parser.parse_args()
+
+epochs = args.e
+lr = args.l
+weights = args.w
 
 modelnet = tf.keras.models.load_model('./bests/modelnet-t07.26.2023@19:30')
 
-inputs = tf.keras.Input(shape=modelnet.input_shape[1:])
-x = inputs
-
-for layer in modelnet.layers[:-5]:
-    if not isinstance(layer, layers.Dropout):
-        x = layer(x)
-
-for u in class_layers:
-    x = layers.Dense(units=u, activation='softmax')(x)
-    x = layers.Dropout(0.3)(x)
-
-x = layers.Dense(units=3, activation='softmax')(x)
-
-outputs = x
-
-new_model = tf.keras.Model(inputs, outputs)
-
-print('New model summary:')
-print(new_model.summary())
-
-for layer in new_model.layers[:-1]:
-    layer.trainable = False
+# for layer in modelnet.layers[:1]:
+#     layer.trainable = False
 
 df = pd.read_csv('./data/adni-LR-nodupsY-train-weights.csv')
 extra_weight = 0.2
@@ -55,7 +42,7 @@ W_valid = (df.loc[df.valid, 'weights'].values + extra_weight)/(1+extra_weight)
 
 
 adam_opt = tf.keras.optimizers.Adam(learning_rate=lr)
-new_model.compile(optimizer=adam_opt,
+modelnet.compile(optimizer=adam_opt,
             weighted_metrics=[],
             loss=tf.keras.losses.CategoricalCrossentropy(),
             metrics=['accuracy']
@@ -72,7 +59,7 @@ reduce_lr = callbacks.ReduceLROnPlateau(
     verbose=0
 )
 
-modelstamp = f'./bests/voxmodelnet-t{timestamp}'
+modelstamp = f'./bests/transfervoxnet-t{timestamp}'
 csv_log = callbacks.CSVLogger(f'{modelstamp}.log')
 checkpoint = callbacks.ModelCheckpoint(
     filepath=modelstamp,
@@ -85,14 +72,21 @@ early_stop = tf.keras.callbacks.EarlyStopping(
     verbose=0
 )
 
-history = new_model.fit(
+if weights:
+    sample_weight=W_train
+    validation_data=(X_valid, Y_valid, W_valid)
+else:
+    sample_weight=None
+    validation_data=None   
+
+history = modelnet.fit(
     X_train,
     Y_train,
-    sample_weight=W_train,
+    sample_weight=sample_weight,
     batch_size=64,
     epochs=epochs,
     shuffle=True,
-    validation_data=(X_valid, Y_valid, W_valid),
+    validation_data=validation_data,
     callbacks=[checkpoint, reduce_lr, csv_log, early_stop],
     verbose=0,
 )

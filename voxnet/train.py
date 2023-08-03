@@ -1,44 +1,46 @@
-import os
 import sys
-import pandas as pd
+import os
+from datetime import datetime
+
 import numpy as np
+import pandas as pd
+from sklearn.preprocessing import OneHotEncoder
 
 import tensorflow as tf
-from sklearn.preprocessing import OneHotEncoder
-from datetime import datetime
 from tensorflow.keras import callbacks, layers
 
+filters=32
+drop=0.4
 
-epochs = int(sys.argv[1])
-class_layers = map(int, sys.argv[2].split('.'))
-lr = float(sys.argv[3])
+net = tf.keras.Sequential()
+net.add(tf.keras.layers.InputLayer(input_shape=(30, 30, 30, 1)))
 
-modelnet = tf.keras.models.load_model('./bests/modelnet-t07.26.2023@19:30')
+net.add(layers.Conv3D(filters=filters, kernel_size=(5, 5, 5), use_bias=False))
+net.add(layers.BatchNormalization())
+net.add(layers.ReLU())
+net.add(layers.MaxPooling3D(pool_size=(2, 2, 2)))
+net.add(layers.Dropout(drop))
 
-inputs = tf.keras.Input(shape=modelnet.input_shape[1:])
-x = inputs
+net.add(layers.Conv3D(filters=filters, kernel_size=(3, 3, 3), use_bias=False))
+net.add(layers.BatchNormalization())
+net.add(layers.ReLU())
+net.add(layers.MaxPooling3D(pool_size=(2, 2, 2)))
+net.add(layers.Dropout(drop))
 
-for layer in modelnet.layers[:-5]:
-    if not isinstance(layer, layers.Dropout):
-        x = layer(x)
+net.add(layers.Flatten())
 
-for u in class_layers:
-    x = layers.Dense(units=u, activation='softmax')(x)
-    x = layers.Dropout(0.3)(x)
+net.add(layers.Dense(units=128, use_bias=False))
+net.add(layers.BatchNormalization())
+net.add(layers.ReLU())
+net.add(layers.Dropout(drop))
 
-x = layers.Dense(units=3, activation='softmax')(x)
+net.add(layers.Dense(units=3, activation='softmax'))
 
-outputs = x
 
-new_model = tf.keras.Model(inputs, outputs)
 
-print('New model summary:')
-print(new_model.summary())
 
-for layer in new_model.layers[:-1]:
-    layer.trainable = False
 
-df = pd.read_csv('./data/adni-LR-nodupsY-train-weights.csv')
+df = pd.read_csv('data/adni-LR-nodupsY-train-weights.csv')
 extra_weight = 0.2
 
 X_train = np.array([np.load(x) for x in df.loc[df.train, 'vox30']])[...,None]
@@ -53,6 +55,8 @@ Y_valid = df.loc[df.valid, 'group'].factorize()[0][...,None]
 Y_valid = OneHotEncoder().fit_transform(Y_valid).toarray()
 W_valid = (df.loc[df.valid, 'weights'].values + extra_weight)/(1+extra_weight)
 
+timestamp = datetime.now().strftime("%m.%d.%Y@%H:%M")
+
 
 adam_opt = tf.keras.optimizers.Adam(learning_rate=lr)
 new_model.compile(optimizer=adam_opt,
@@ -60,9 +64,6 @@ new_model.compile(optimizer=adam_opt,
             loss=tf.keras.losses.CategoricalCrossentropy(),
             metrics=['accuracy']
 )
-
-timestamp = datetime.now().strftime("%m.%d.%Y@%H:%M")
-print(f"Voxmodelnet: Training started at {timestamp}")
 
 reduce_lr = callbacks.ReduceLROnPlateau(
     factor=0.5, 
@@ -96,5 +97,3 @@ history = new_model.fit(
     callbacks=[checkpoint, reduce_lr, csv_log, early_stop],
     verbose=0,
 )
-
-
