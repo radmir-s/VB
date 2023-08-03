@@ -22,9 +22,14 @@ lr = args.learning_rate
 weights = args.weight
 jobid = args.job_id
 
-modelnet = tf.keras.models.load_model('./bests/modelnet-t07.26.2023@19:30')
+pretrained_model = tf.keras.models.load_model('./bests/modelnet-t07.26.2023@19:30')
+pretrained_model.layers.pop()
+inputs = pretrained_model.input
+new_layer = layers.Dense(10, activation='softmax')
+outputs = new_layer(pretrained_model.layers[-1].output)
+new_model = Model(inputs=inputs, outputs=outputs)
 
-# for layer in modelnet.layers[:1]:
+# for layer in new_model.layers[:1]:
 #     layer.trainable = False
 
 df = pd.read_csv('./data/adni-LR-nodupsY-train-weights.csv')
@@ -44,14 +49,14 @@ W_valid = (df.loc[df.valid, 'weights'].values + extra_weight)/(1+extra_weight)
 
 
 adam_opt = tf.keras.optimizers.Adam(learning_rate=lr)
-modelnet.compile(optimizer=adam_opt,
+new_model.compile(optimizer=adam_opt,
             weighted_metrics=[],
             loss=tf.keras.losses.CategoricalCrossentropy(),
             metrics=['accuracy']
 )
 
 timestamp = datetime.now().strftime("%m.%d.%Y@%H:%M")
-print(f"Voxmodelnet: Training started at {timestamp}")
+print(f"Transfervoxnet: Training started at {timestamp}")
 
 reduce_lr = callbacks.ReduceLROnPlateau(
     factor=0.5, 
@@ -81,7 +86,7 @@ else:
     sample_weight=None
     validation_data=None   
 
-history = modelnet.fit(
+history = new_model.fit(
     X_train,
     Y_train,
     sample_weight=sample_weight,
