@@ -1,6 +1,6 @@
 #!/bin/bash 
-#SBATCH -J  job_voxnet
-#SBATCH -o  job_voxnet.o%j
+#SBATCH -J  tensorjob
+#SBATCH -o  tensorjob.o%j
 
 #SBATCH -A mang
 #SBATCH --mail-user=rsultamuratov@uh.edu
@@ -14,4 +14,4 @@
 
 module add TensorFlow
 cd /project/mang/rsultamu/ventricles
-python $@
+python $@ -j $SLURM_JOB_ID

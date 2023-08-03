@@ -9,16 +9,18 @@ from sklearn.preprocessing import OneHotEncoder
 from datetime import datetime
 from tensorflow.keras import callbacks, layers
 
-
+parser = argparse.ArgumentParser()
 parser.add_argument('-e', '--epochs', type=int, default=1000)
 parser.add_argument('-l', '--learning-rate', type=float, default=0.0001)
 parser.add_argument('-w', '--weight', action='store_true',
                     help='Set weight to true')
+parser.add_argument('-j', '--job-id', type=int)
 args = parser.parse_args()
 
-epochs = args.e
-lr = args.l
-weights = args.w
+epochs = args.epochs
+lr = args.learning_rate
+weights = args.weight
+jobid = args.job_id
 
 modelnet = tf.keras.models.load_model('./bests/modelnet-t07.26.2023@19:30')
 
@@ -59,7 +61,7 @@ reduce_lr = callbacks.ReduceLROnPlateau(
     verbose=0
 )
 
-modelstamp = f'./bests/transfervoxnet-t{timestamp}'
+modelstamp = f'./bests/transfervoxnet-t{timestamp}-j{jobid}'
 csv_log = callbacks.CSVLogger(f'{modelstamp}.log')
 checkpoint = callbacks.ModelCheckpoint(
     filepath=modelstamp,
