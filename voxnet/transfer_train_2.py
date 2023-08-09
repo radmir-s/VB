@@ -32,7 +32,7 @@ new_model = tf.keras.Model(inputs=inputs, outputs=outputs)
 # for layer in new_model.layers[:1]:
 #     layer.trainable = False
 
-df = pd.read_csv('./data/adni-LR-nodupsY-train-weights.csv')
+df = pd.read_csv('./data/adni-LR-nodupsY-train-weights-2.csv')
 extra_weight = 0.2
 
 X_train = np.array([np.load(x) for x in df.loc[df.train, 'vox30']])[...,None]
