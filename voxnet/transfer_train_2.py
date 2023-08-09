@@ -62,7 +62,7 @@ reduce_lr = callbacks.ReduceLROnPlateau(
     factor=0.5, 
     min_lr=lr/100, 
     monitor='val_loss', 
-    patience=10,
+    patience=20,
     verbose=0
 )
 
@@ -79,7 +79,7 @@ print(f'logabspath:{logabspath}')
 
 early_stop = tf.keras.callbacks.EarlyStopping(
     monitor='val_loss',
-    patience=50,
+    patience=500,
     verbose=0
 )
 
