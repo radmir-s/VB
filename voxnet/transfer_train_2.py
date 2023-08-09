@@ -20,7 +20,7 @@ args = parser.parse_args()
 epochs = args.epochs
 lr = args.learning_rate
 weights = args.weight
-jobid = args.job_id
+jobid = os.environ.get('SLURM_JOB_ID')
 
 pretrained_model = tf.keras.models.load_model('./bests/modelnet-t07.26.2023@19:30')
 pretrained_model.layers.pop()
@@ -55,7 +55,7 @@ new_model.compile(optimizer=adam_opt,
             metrics=['accuracy']
 )
 
-timestamp = datetime.now().strftime("%m.%d.%Y@%H:%M")
+timestamp = datetime.now().strftime("%m.%d.%Y.%H:%M")
 print(f"Transfervoxnet: Training started at {timestamp}")
 
 reduce_lr = callbacks.ReduceLROnPlateau(
@@ -73,6 +73,10 @@ checkpoint = callbacks.ModelCheckpoint(
     save_best_only=True,
     verbose=0
 )
+
+logabspath = os.path.abspath(f'{modelstamp}.log')
+print(f'logabspath:{logabspath}')
+
 early_stop = tf.keras.callbacks.EarlyStopping(
     monitor='val_loss',
     patience=50,
@@ -97,5 +101,4 @@ history = new_model.fit(
     callbacks=[checkpoint, reduce_lr, csv_log, early_stop],
     verbose=0,
 )
-
 

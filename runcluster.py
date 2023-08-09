@@ -2,6 +2,7 @@ import os
 import paramiko
 import yaml
 import argparse
+import subprocess
 
 def load_credentials(yaml_file):
     with open(yaml_file, 'r') as file:
@@ -19,18 +20,24 @@ username = credentials['username']
 password = credentials['password']
 remotehome = credentials['remotehome']
 localhome = credentials['localhome']
+remote_script = os.path.join(remotehome, args.script)
+local_script = os.path.join(localhome, args.script)
+
+subprocess.run(["git", "add", local_script])
+subprocess.run(["git", "add", 'tensorjob.sh'])
+subprocess.run(["git", "add", 'runcluster.py'])
+subprocess.run(["git", "commit", "-m", "runcluster++"])
+subprocess.run(["git", "push"])
 
 ssh_client = paramiko.SSHClient()
 ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 ssh_client.connect(hostname, username=username, password=password)
-# sftp = ssh_client.open_sftp()
 
-# remote_script = os.path.join(remotehome, args.script)
-# local_script = os.path.join(localhome, args.script)
+# sftp = ssh_client.open_sftp()
 # sftp.put(local_script, remote_script)
 
 stdin, stdout, stderr = ssh_client.exec_command(f'cd {remotehome}; git pull; sbatch tensorjob.sh {remote_script} {args.args};')
 print(stdout.read().decode())
 
-sftp.close()
+# sftp.close()
 ssh_client.close()

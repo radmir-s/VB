@@ -14,4 +14,4 @@
 
 module add TensorFlow
 cd /project/mang/rsultamu/ventricles
-python $@ -j $SLURM_JOB_ID
+python $@
