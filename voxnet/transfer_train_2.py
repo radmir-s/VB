@@ -11,7 +11,7 @@ from tensorflow.keras import callbacks, layers
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-e', '--epochs', type=int, default=1000)
-parser.add_argument('-l', '--learning-rate', type=float, default=0.0001)
+parser.add_argument('-l', '--learning-rate', type=float, default=1e-4)
 parser.add_argument('-w', '--weight', action='store_true',
                     help='Set weight to true')
 parser.add_argument('-j', '--job-id', type=int)
@@ -98,7 +98,8 @@ history = new_model.fit(
     epochs=epochs,
     shuffle=True,
     validation_data=validation_data,
-    callbacks=[checkpoint, reduce_lr, csv_log, early_stop],
+    # callbacks=[checkpoint, reduce_lr, csv_log, early_stop],
+    callbacks=[checkpoint, csv_log, early_stop],
     verbose=0,
 )
 
